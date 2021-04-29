@@ -8,7 +8,11 @@ let currentStatus = sample(STATUSES);
 
 const status = resolver(async () => currentStatus);
 
-const statusUpdate = resolver(async (_, args, { pubsub }) => {
+const allStatus = resolver(async () => STATUSES);
+
+const totalStatus = resolver(async () => STATUSES.length);
+
+const updateStatus = resolver(async (_, args, { pubsub }) => {
   currentStatus = sample(STATUSES.filter((status) => status !== currentStatus));
 
   pubsub.publish("statusUpdated", { statusUpdated: currentStatus });
@@ -16,20 +20,22 @@ const statusUpdate = resolver(async (_, args, { pubsub }) => {
   return currentStatus;
 });
 
-const statusUpdated = subscription(async (_, args, { pubsub }) =>
+const updatedStatus = subscription(async (_, args, { pubsub }) =>
   pubsub.asyncIterator("statusUpdated"),
 );
 
 export const resolvers = {
   Query: {
+    allStatus,
     status,
+    totalStatus,
   },
 
   Mutation: {
-    statusUpdate,
+    updateStatus,
   },
 
   Subscription: {
-    statusUpdated,
+    updatedStatus,
   },
 };
