@@ -1,29 +1,23 @@
-import { DocumentNode } from "graphql";
-import { IResolvers, ExpressContext } from "apollo-server-express";
+import { ApolloServerExpressConfig } from "apollo-server-express";
 import { Server } from "http";
 import { createApolloServer } from "./createApolloServer";
 import { createPubSub } from "./createPubSub";
 
-interface CreateApolloProps {
-  typeDefs: DocumentNode[];
-  resolvers: IResolvers<any, any>[];
-  context: (ctx: ExpressContext) => Record<string, any>;
-}
-
 export const createApollo = ({
-  typeDefs,
-  resolvers,
-  context,
-}: CreateApolloProps) => {
+  context = {},
+  ...rest
+}: ApolloServerExpressConfig) => {
   const pubsub = createPubSub();
 
   const apolloServer = createApolloServer({
-    typeDefs,
-    resolvers,
     context: async (...args) => {
+      if (typeof context === "object") {
+        return { ...context, pubsub };
+      }
       const ctx = await context(...args);
       return { ...ctx, pubsub };
     },
+    ...rest,
     uploads: true,
     introspection: true,
     playground: true,

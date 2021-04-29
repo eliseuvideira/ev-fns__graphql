@@ -89,4 +89,41 @@ describe("createApollo", () => {
     expect(ctx).toBeDefined();
     expect(ctx.pubsub).toBe(pubsub);
   });
+
+  it("works for context as object", async () => {
+    expect.assertions(5);
+
+    {
+      const contextProp = {};
+      const contextObj = { contextProp };
+
+      createApollo({
+        typeDefs: {} as any,
+        resolvers: {} as any,
+        context: contextObj,
+      });
+
+      const [{ context }] = createApolloServer.mock.calls[1] as any;
+
+      const ctx = await context();
+
+      expect(ctx).toBeDefined();
+      expect(ctx.pubsub).toBe(pubsub);
+      expect(ctx.contextProp).toBe(contextProp);
+    }
+
+    {
+      createApollo({
+        typeDefs: {} as any,
+        resolvers: {} as any,
+      });
+
+      const [{ context }] = createApolloServer.mock.calls[1] as any;
+
+      const ctx = await context();
+
+      expect(ctx).toBeDefined();
+      expect(ctx.pubsub).toBe(pubsub);
+    }
+  });
 });
