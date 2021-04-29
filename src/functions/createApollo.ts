@@ -44,7 +44,7 @@ export const createApollo = ({
         : []),
     ],
     ...rest,
-    uploads: true,
+    uploads: false,
     introspection: true,
     playground: true,
   });
