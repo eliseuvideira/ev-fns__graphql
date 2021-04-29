@@ -13,7 +13,9 @@
     "lib/**/*"
   ],
   "devDependencies": {
+    "@types/graphql-upload": "^8.0.4",
     "@types/jest": "^26.0.23",
+    "@types/lodash": "^4.14.168",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "eslint": "^7.25.0",
@@ -27,7 +29,9 @@
   "dependencies": {
     "apollo-server-express": "^2.23.0",
     "graphql": "^15.5.0",
-    "graphql-subscriptions": "^1.2.1"
+    "graphql-subscriptions": "^1.2.1",
+    "graphql-upload": "^11.0.0",
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {},
   "scripts": {
