@@ -1,5 +1,4 @@
 import { ApolloServerExpressConfig } from "apollo-server-express";
-import { UploadOptions } from "graphql-upload";
 import { Server } from "http";
 import { createApolloServer } from "./createApolloServer";
 import { craeteGraphqlUpload } from "./createGraphqlUpload";
@@ -19,7 +18,11 @@ export const createApollo = ({
   ...rest
 }: Omit<ApolloServerExpressConfig, "typeDefs"> & {
   typeDefs: DocumentNode | DocumentNode[];
-} & Partial<UploadOptions>) => {
+} & {
+  maxFieldSize?: number;
+  maxFileSize?: number;
+  maxFiles?: number;
+}) => {
   const pubsub = createPubSub();
 
   const apolloServer = createApolloServer({
