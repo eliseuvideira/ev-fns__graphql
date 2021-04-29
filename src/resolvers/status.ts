@@ -15,13 +15,13 @@ const totalStatus = resolver(async () => STATUSES.length);
 const updateStatus = resolver(async (_, args, { pubsub }) => {
   currentStatus = sample(STATUSES.filter((status) => status !== currentStatus));
 
-  pubsub.publish("statusUpdated", { statusUpdated: currentStatus });
+  pubsub.publish("onUpdateStatus", { onUpdateStatus: currentStatus });
 
   return currentStatus;
 });
 
-const updatedStatus = subscription(async (_, args, { pubsub }) =>
-  pubsub.asyncIterator("statusUpdated"),
+const onUpdateStatus = subscription(async (_, args, { pubsub }) =>
+  pubsub.asyncIterator("onUpdateStatus"),
 );
 
 export const resolvers = {
@@ -36,6 +36,6 @@ export const resolvers = {
   },
 
   Subscription: {
-    updatedStatus,
+    onUpdateStatus,
   },
 };

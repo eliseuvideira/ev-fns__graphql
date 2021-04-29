@@ -12,6 +12,6 @@ export const typeDefs = gql`
   }
 
   type Subscription {
-    updatedStatus: String!
+    onUpdateStatus: String!
   }
 `;
