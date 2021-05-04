@@ -9,8 +9,8 @@ export const validate = <
   Ctx extends Context = Context,
   Result = any
 >(
-  resolv: ResolverFn<Parent, Args, Ctx, Result>,
   schema: ObjectSchema,
+  resolv: ResolverFn<Parent, Args, Ctx, Result>,
 ) =>
   resolver<Parent, Args, Ctx, Result>(async (parent, args, ctx, ...rest) => {
     let value;
