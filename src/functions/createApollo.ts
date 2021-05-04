@@ -26,11 +26,11 @@ export const createApollo = ({
   const pubsub = createPubSub();
 
   const apolloServer = createApolloServer({
-    context: async (...args) => {
+    context: async (args) => {
       if (typeof context === "object") {
         return { ...context, ...args, pubsub };
       }
-      const ctx = await context(...args);
+      const ctx = await context(args);
       return { ...ctx, pubsub };
     },
     typeDefs: [
