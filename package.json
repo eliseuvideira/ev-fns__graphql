@@ -1,6 +1,6 @@
 {
   "name": "@ev-fns/graphql",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "repository": "git@github.com:eliseuvideira/ev-fns__graphql.git",
