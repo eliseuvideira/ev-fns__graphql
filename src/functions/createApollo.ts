@@ -15,6 +15,7 @@ export const createApollo = ({
   maxFiles,
   typeDefs,
   resolvers,
+  formatError,
   ...rest
 }: Omit<ApolloServerExpressConfig, "typeDefs"> & {
   typeDefs: DocumentNode | DocumentNode[];
@@ -46,6 +47,25 @@ export const createApollo = ({
           : [resolvers]
         : []),
     ],
+    formatError: (err) => {
+      if (
+        err.originalError &&
+        err.extensions &&
+        err.extensions.code === "INTERNAL_SERVER_ERROR"
+      ) {
+        console.error(err);
+        console.error(err.originalError);
+        if (process.env.NODE_ENV === "production") {
+          err.message = "Internal server error";
+        }
+      }
+
+      if (formatError) {
+        return formatError(err);
+      }
+
+      return err;
+    },
     ...rest,
     uploads: false,
     introspection: true,
