@@ -2,16 +2,16 @@ import { gql } from "apollo-server-core";
 
 export const typeDefs = gql`
   type Query {
-    status: String!
-    allStatus: [String!]!
-    totalStatus: Int!
+    StatusGetOne: String!
+    StatusGetMany: [String!]!
+    StatusTotalCount: Int!
   }
 
   type Mutation {
-    updateStatus: String!
+    StatusUpdateOne: String!
   }
 
   type Subscription {
-    onUpdateStatus: String!
+    StatusOnUpdate: String!
   }
 `;

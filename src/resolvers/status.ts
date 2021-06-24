@@ -1,41 +1,37 @@
-import { sample } from "lodash";
 import { resolver } from "../functions/resolver";
 import { subscription } from "../functions/subscription";
+import { status } from "../models/status";
 
-const STATUSES = ["😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"];
+const StatusGetOne = resolver(async () => status.current);
 
-let currentStatus = sample(STATUSES);
+const StatusGetMany = resolver(async () => status.all);
 
-const status = resolver(async () => currentStatus);
+const StatusTotalCount = resolver(async () => status.all.length);
 
-const allStatus = resolver(async () => STATUSES);
+const StatusUpdateOne = resolver(async (_, args, { pubsub }) => {
+  status.randomize();
 
-const totalStatus = resolver(async () => STATUSES.length);
+  pubsub.publish("StatusOnUpdate", { StatusOnUpdate: status.current });
 
-const updateStatus = resolver(async (_, args, { pubsub }) => {
-  currentStatus = sample(STATUSES.filter((status) => status !== currentStatus));
-
-  pubsub.publish("onUpdateStatus", { onUpdateStatus: currentStatus });
-
-  return currentStatus;
+  return status.current;
 });
 
-const onUpdateStatus = subscription(async (_, args, { pubsub }) =>
-  pubsub.asyncIterator("onUpdateStatus"),
+const StatusOnUpdate = subscription(async (_, args, { pubsub }) =>
+  pubsub.asyncIterator("StatusOnUpdate"),
 );
 
 export const resolvers = {
   Query: {
-    allStatus,
-    status,
-    totalStatus,
+    StatusGetMany,
+    StatusGetOne,
+    StatusTotalCount,
   },
 
   Mutation: {
-    updateStatus,
+    StatusUpdateOne,
   },
 
   Subscription: {
-    onUpdateStatus,
+    StatusOnUpdate,
   },
 };
