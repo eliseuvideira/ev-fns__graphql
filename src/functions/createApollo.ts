@@ -1,7 +1,7 @@
 import { ApolloServerExpressConfig } from "apollo-server-express";
 import { Server } from "http";
 import { createApolloServer } from "./createApolloServer";
-import { craeteGraphqlUpload } from "./createGraphqlUpload";
+import { createGraphqlUpload } from "./createGraphqlUpload";
 import { createPubSub } from "./createPubSub";
 import { resolvers as statusResolvers } from "../resolvers/status";
 import { typeDefs as rootTypeDefs } from "../typeDefs/root";
@@ -54,7 +54,7 @@ export const createApollo = ({
 
   const apollo = apolloServer.getMiddleware();
 
-  const apolloUpload = craeteGraphqlUpload({
+  const apolloUpload = createGraphqlUpload({
     maxFieldSize,
     maxFileSize,
     maxFiles,

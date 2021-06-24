@@ -1,4 +1,4 @@
 import { graphqlUploadExpress, UploadOptions } from "graphql-upload";
 
-export const craeteGraphqlUpload = (options?: UploadOptions) =>
+export const createGraphqlUpload = (options?: UploadOptions) =>
   graphqlUploadExpress(options);
