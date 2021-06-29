@@ -16,6 +16,7 @@ export const createApollo = ({
   typeDefs,
   resolvers,
   formatError,
+  cors = true,
   ...rest
 }: Omit<ApolloServerExpressConfig, "typeDefs"> & {
   typeDefs: DocumentNode | DocumentNode[];
@@ -23,6 +24,7 @@ export const createApollo = ({
   maxFieldSize?: number;
   maxFileSize?: number;
   maxFiles?: number;
+  cors?: boolean;
 }) => {
   const pubsub = createPubSub();
 
@@ -72,7 +74,7 @@ export const createApollo = ({
     playground: true,
   });
 
-  const apollo = apolloServer.getMiddleware();
+  const apollo = apolloServer.getMiddleware({ cors });
 
   const apolloUpload = createGraphqlUpload({
     maxFieldSize,
