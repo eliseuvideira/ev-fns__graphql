@@ -37,7 +37,8 @@
     "@graphql-tools/schema": "^8.1.1",
     "@graphql-tools/utils": "^8.1.1",
     "lodash": "^4.17.21",
-    "subscriptions-transport-ws": "^0.9.19"
+    "subscriptions-transport-ws": "^0.9.19",
+    "ws": "^8.1.0"
   },
   "peerDependencies": {
     "apollo-server-core": ">=3.1",
