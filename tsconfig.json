@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "lib",
     "target": "ESNext",
     "module": "CommonJS",
+    "rootDir": "src",
+    "outDir": "lib",
     "removeComments": true,
     "strict": true,
     "noImplicitReturns": true,
@@ -12,5 +12,8 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "ts-node": {
+    "files": true
+  }
 }

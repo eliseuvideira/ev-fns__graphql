@@ -1,89 +1,83 @@
-import { ApolloServerExpressConfig } from "apollo-server-express";
-import { Server } from "http";
-import { createApolloServer } from "./createApolloServer";
+import {
+  ApolloServer,
+  ApolloServerExpressConfig,
+  Config,
+  ExpressContext,
+} from "apollo-server-express";
 import { createGraphqlUpload } from "./createGraphqlUpload";
-import { createPubSub } from "./createPubSub";
-import { resolvers as statusResolvers } from "../resolvers/status";
 import { typeDefs as rootTypeDefs } from "../typeDefs/root";
-import { typeDefs as statusTypeDefs } from "../typeDefs/status";
-import { DocumentNode } from "apollo-link";
+import { DocumentNode } from "graphql";
+import { PubSub } from "graphql-subscriptions";
+import { IResolvers } from "@graphql-tools/utils";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { UploadOptions } from "graphql-upload";
+import { createContext } from "./createContext";
+import { ContextFunction } from "apollo-server-core";
+import { createFormatError } from "./createFormatError";
+import { createSubscriptions } from "./createSubscriptions";
 
-export const createApollo = ({
-  context = {},
+export type CreateApolloBaseProps = Omit<
+  Omit<Omit<ApolloServerExpressConfig, "typeDefs">, "resolvers">,
+  "context"
+>;
+
+export interface CreateApolloProps<T extends ExpressContext>
+  extends CreateApolloBaseProps,
+    UploadOptions {
+  resolvers: IResolvers[];
+  typeDefs: DocumentNode[];
+  context: Record<string, any> | ContextFunction<T>;
+  cors?: boolean;
+}
+
+export const createApollo = <T extends ExpressContext>({
+  typeDefs: _typeDefs,
+  resolvers: _resolvers,
+  context: _context = {},
+  formatError: _formatError,
+  introspection: _introspection,
   maxFieldSize,
   maxFileSize,
   maxFiles,
-  typeDefs,
-  resolvers,
-  formatError,
   cors = true,
-  ...rest
-}: Omit<ApolloServerExpressConfig, "typeDefs"> & {
-  typeDefs: DocumentNode | DocumentNode[];
-} & {
-  maxFieldSize?: number;
-  maxFileSize?: number;
-  maxFiles?: number;
-  cors?: boolean;
-}) => {
-  const pubsub = createPubSub();
+  ...configProps
+}: CreateApolloProps<T>) => {
+  const pubsub = new PubSub();
 
-  const apolloServer = createApolloServer({
-    context: async (args) => {
-      if (typeof context === "object") {
-        return { ...context, ...args, pubsub };
-      }
-      const ctx = await context(args);
-      return { ...ctx, pubsub };
-    },
-    typeDefs: [
-      rootTypeDefs,
-      statusTypeDefs,
-      ...(Array.isArray(typeDefs) ? typeDefs : [typeDefs]),
-    ],
-    resolvers: [
-      statusResolvers,
-      ...(resolvers
-        ? Array.isArray(resolvers)
-          ? resolvers
-          : [resolvers]
-        : []),
-    ],
-    formatError: (err) => {
-      if (
-        err.originalError &&
-        err.extensions &&
-        err.extensions.code === "INTERNAL_SERVER_ERROR"
-      ) {
-        console.error(err);
-        console.error(err.originalError);
-        if (process.env.NODE_ENV === "production") {
-          err.message = "Internal server error";
-        }
-      }
+  const typeDefs = [rootTypeDefs, ..._typeDefs];
 
-      if (formatError) {
-        return formatError(err);
-      }
+  const resolvers = [..._resolvers];
 
-      return err;
-    },
-    ...rest,
-    uploads: false,
-    introspection: true,
-    playground: true,
-  });
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-  const apollo = apolloServer.getMiddleware({ cors });
+  const context = createContext(_context, pubsub);
 
-  const apolloUpload = createGraphqlUpload({
+  const formatError = createFormatError(_formatError);
+
+  const introspection =
+    _introspection != null
+      ? process.env.NODE_ENV !== "production"
+      : _introspection;
+
+  const config: Config<ExpressContext> = {
+    schema,
+    context,
+    formatError,
+    introspection,
+    ...configProps,
+  };
+
+  const apolloServer = new ApolloServer(config);
+
+  const middleware = apolloServer.getMiddleware({ cors });
+
+  const upload = createGraphqlUpload({
     maxFieldSize,
     maxFileSize,
     maxFiles,
   });
 
-  const installSubscriptions = (server: Server) =>
-    apolloServer.installSubscriptionHandlers(server);
+  const subscriptions = createSubscriptions(apolloServer);
 
-  return { apollo, apolloUpload, installSubscriptions };
+  return { middleware, upload, subscriptions };
 };
