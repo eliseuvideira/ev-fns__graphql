@@ -36,6 +36,7 @@
   "dependencies": {
     "@graphql-tools/schema": "^8.1.1",
     "@graphql-tools/utils": "^8.1.1",
+    "@types/ws": "^7.4.7",
     "lodash": "^4.17.21",
     "subscriptions-transport-ws": "^0.9.19",
     "ws": "^8.1.0"
